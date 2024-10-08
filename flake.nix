@@ -26,7 +26,14 @@
       inputs.nixpkgs.lib.genAttrs ["default"] (
         _:
           inputs.nixpkgs.legacyPackages.${system}.mkShell {
-            buildInputs = [
+            buildInputs =
+            let
+              # Alias pour gnome-bluetooth avec un nom de paquet spécifique
+              gnome-bluetooth = if pkgsFor.${system}.lib.hasAttr "gnome-bluetooth" pkgsFor.${system}
+                then pkgsFor.${system}.gnome-bluetooth
+                else pkgsFor.${system}.gnome.gnome-bluetooth;
+            in
+            [
               pkgsFor.${system}.esbuild
               pkgsFor.${system}.fish
               pkgsFor.${system}.typescript
@@ -43,11 +50,12 @@
               pkgsFor.${system}.grimblast
               pkgsFor.${system}.gpu-screen-recorder
               pkgsFor.${system}.brightnessctl
-              pkgsFor.${system}.gnome.gnome-bluetooth
+              gnome-bluetooth
               pkgsFor.${system}.python3
               pkgsFor.${system}.matugen
               inputs.ags.packages.${system}.agsWithTypes
             ];
+
             nativeBuildInputs = with pkgsFor.${system}; [
               nixfmt-rfc-style
               nil
